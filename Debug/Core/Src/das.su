@@ -1,0 +1,16 @@
+das.c:53:6:DAS_Init	4	static
+das.c:81:9:DAS_AnalogChannelExists	16	static
+das.c:86:9:DAS_PulseChannelExists	16	static
+das.c:91:9:DAS_IsPulseChannelModeExists	16	static
+das.c:96:9:DAS_SetChannelMode	16	static
+das.c:112:9:DAS_SetAnalogChannelValue	16	static
+das.c:128:9:DAS_GetAnalogChannelValueData	16	static
+das.c:144:9:DAS_SetPulseChannelMode	16	static
+das.c:160:9:DAS_SetPulseChannelValue	16	static
+das.c:177:9:DAS_GetPulseChannelValue	16	static
+das.c:194:9:DAS_ResetPulseChannel	16	static
+das.c:206:13:das_print	24	static
+das.c:210:10:das_read	48	static
+das.c:272:10:das_makePacket	40	static
+das.c:464:10:byte_serialize	32	static
+das.c:494:10:byte_deserialize	32	static

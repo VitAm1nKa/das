@@ -1,0 +1,4 @@
+net_utilities.c:3:10:checksum	24	static
+net_utilities.c:73:10:crc32	32	static
+net_utilities.c:85:6:rmemcpy32	32	static
+net_utilities.c:95:6:rmemcpy	32	static

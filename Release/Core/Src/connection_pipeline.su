@@ -1,0 +1,2 @@
+connection_pipeline.c:20:6:listening	40	static
+connection_pipeline.c:68:6:start_listening	16	static

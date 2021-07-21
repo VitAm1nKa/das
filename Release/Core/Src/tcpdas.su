@@ -1,0 +1,2 @@
+tcpdas.c:18:13:tcpdas_thread	40	static
+tcpdas.c:68:6:tcpdas_init	16	static

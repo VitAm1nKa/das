@@ -559,11 +559,11 @@ void StartNetTask1(void *argument)
 }
 
 unsigned char *out_buffer;
-char buffer [150];
 
 static void client_socket_thread(void *arg)
 {
 	int buflen = 150;
+	uint8_t buffer [buflen];
 	int ret, accept_sock;
 	struct sockaddr_in remotehost;
 	socklen_t sockaddrsize;
@@ -581,14 +581,14 @@ static void client_socket_thread(void *arg)
 		if(ret > 0)
 		{
 			// HAL_GPIO_WritePin(GPIOB, LedGreen_Pin, GPIO_PIN_SET);
-			out_buffer[ret] = 0;
-
-			if(strcmp((char*)out_buffer, "-c") == 0)
-			{
-				// HAL_GPIO_WritePin(GPIOB, LedGreen_Pin, GPIO_PIN_RESET);
-				close(accept_sock);
-				osThreadTerminate(NULL);
-			}
+//			out_buffer[ret] = 0;
+//
+//			if(strcmp((char*)out_buffer, "-c") == 0)
+//			{
+//				// HAL_GPIO_WritePin(GPIOB, LedGreen_Pin, GPIO_PIN_RESET);
+//				close(accept_sock);
+//				osThreadTerminate(NULL);
+//			}
 
 //			if(strcmp((char*)out_buffer, "\r\n") != 0)
 //			{
@@ -608,32 +608,38 @@ static void client_socket_thread(void *arg)
 
 			// sendto(accept_sock, buffer, ret, 0, (struct sockaddr *)&remotehost, sockaddrsize);
 //
-			// das_len = das_read(buffer, ret);
+			das_len = das_read(buffer, ret);
 //
 //			HAL_GPIO_WritePin(GPIOB, LedBlue_Pin, GPIO_PIN_SET);
 //
 			if(das_len > 0)
 			{
-			  HAL_GPIO_WritePin(GPIOB, LedBlue_Pin, GPIO_PIN_SET);
+			  //HAL_GPIO_WritePin(GPIOB, LedBlue_Pin, GPIO_PIN_SET);
 			  sendto(accept_sock, buffer, das_len, 0, (struct sockaddr *)&remotehost, sockaddrsize);
 			}
 			else
 			{
-			  HAL_GPIO_WritePin(GPIOA, LedRed_Pin, GPIO_PIN_SET);
+			  //HAL_GPIO_WritePin(GPIOA, LedRed_Pin, GPIO_PIN_SET);
 			  sendto(accept_sock, buffer, ret, 0, (struct sockaddr *)&remotehost, sockaddrsize);
 			}
 
-			close(accept_sock);
-			osThreadTerminate(NULL);
+//			close(accept_sock);
+//			osThreadTerminate(NULL);
 //
 //			HAL_GPIO_WritePin(GPIOB, LedBlue_Pin, GPIO_PIN_RESET);
 //			HAL_GPIO_WritePin(GPIOA, LedRed_Pin, GPIO_PIN_RESET);
+		} else {
+			close(accept_sock);
+			osThreadTerminate(NULL);
 		}
+
 	}
 }
 
 static void tcp_thread(void *arg)
 {
+	MX_LWIP_Init();
+
 	struct_sock *arg_sock;
 	int sock, accept_sock;
 	struct sockaddr_in address, remotehost;
@@ -661,24 +667,29 @@ static void tcp_thread(void *arg)
 					client_socket01.y_pos = arg_sock->y_pos;
 					sys_thread_new("client_socket_thread", client_socket_thread, (void*)&client_socket01, DEFAULT_THREAD_STACKSIZE, osPriorityNormal);
 
-					close(sock);
+					// close(sock);
 					// HAL_GPIO_WritePin(GPIOB, LedGreen_Pin, GPIO_PIN_RESET);
-					osThreadTerminate(NULL);
+					// osThreadTerminate(NULL);
 				}
 			}
 		}
 		else
 		{
 			close(sock);
-			return;
+			osThreadTerminate(NULL);
 		}
 	}
 }
 
 static void myrg() {
+	osDelay(300);
+	HAL_GPIO_WritePin(GPIOB, LedGreen_Pin, GPIO_PIN_RESET);
+
 	for(;;) {
+		osDelay(1000);
 		HAL_GPIO_TogglePin(GPIOB, LedGreen_Pin);
-		osDelay(250);
+//		NVIC_SystemReset();
+//		HAL_NVIC_SystemReset();
 	}
 }
 
@@ -694,12 +705,13 @@ static void myrg() {
 void StartDefaultTask(void *argument)
 {
   /* init code for LWIP */
-  MX_LWIP_Init();
+  // MX_LWIP_Init();
   /* USER CODE BEGIN 5 */
+
+  	HAL_GPIO_WritePin(GPIOB, LedGreen_Pin, GPIO_PIN_SET);
 
 	// Init DAS
 	DAS_Init();
-
 
 	sock01.port = 8082;
 	sock01.y_pos = 60;
@@ -708,43 +720,24 @@ void StartDefaultTask(void *argument)
 	sys_thread_new("myrg", myrg, NULL, DEFAULT_THREAD_STACKSIZE, osPriorityRealtime7);
 
     // prepare ADC to read data
-    // HAL_ADC_Start_DMA(&hadc1, value, 4);
+    HAL_ADC_Start_DMA(&hadc1, value, 4);
 
   /* Infinite loop */
 	for(;;)
 	{
-		osThreadTerminate(NULL);
-//		HAL_ADC_Start_DMA(&hadc1, value, 4);
-//		DAS_SetAnalogChannelValue(0, value[0]);
-//		DAS_SetAnalogChannelValue(1, value[1]);
-//		DAS_SetAnalogChannelValue(2, value[2]);
-//		DAS_SetAnalogChannelValue(3, value[3]);
+		// osThreadTerminate(NULL);
+		HAL_ADC_Start_DMA(&hadc1, value, 4);
+		DAS_SetAnalogChannelValue(0, value[0]);
+		DAS_SetAnalogChannelValue(1, value[1]);
+		DAS_SetAnalogChannelValue(2, value[2]);
+		DAS_SetAnalogChannelValue(3, value[3]);
 
-		osDelay(1);
+		sys_check_timeouts();
+
+		osDelay(100);
 	}
 
   /* USER CODE END 5 */
-}
-
- /**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM6 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM6) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
 }
 
 /**

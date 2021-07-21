@@ -1,0 +1,11 @@
+main.c:682:13:myrg	8	static,ignoring_inline_asm
+main.c:702:6:StartDefaultTask	16	static
+main.c:639:13:tcp_thread	80	static
+main.c:563:13:client_socket_thread	208	static
+main.c:177:6:SystemClock_Config	88	static,ignoring_inline_asm
+main.c:95:5:main	48	static,ignoring_inline_asm
+main.c:363:6:StartNetTask	0	static
+main.c:419:6:ConnectionListenTask	16	static
+main.c:504:6:ConnectionsCounter	8	static
+main.c:513:6:StartNetTask1	48	static
+main.c:744:6:Error_Handler	0	static,ignoring_inline_asm
